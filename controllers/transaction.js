@@ -92,7 +92,7 @@ exports.getTransactionSummary = async (req, res) => {
         income: transaction.income || 0,
         expense: transaction.expense || 0,
         saving: saving || 0,
-        userAccount: transaction.userAccount || 0,
+        userAccount: transaction.userAccount,
       };
     });
 
