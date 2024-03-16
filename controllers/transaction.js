@@ -4,12 +4,12 @@ const userSchema = require('../models/user')
 
 exports.createTransaction = async (req, res) => {
   try {
-    const { Transaction_type, amount, category, description, userAccount, userId } =
+    const { income, expense, description, userAccount, userId } =
       req.body;
     const newTransaction = new transactionSchema({
-      Transaction_type,
-      amount,
-      category,
+      income,
+      expense,
+      saving: income-expense,
       description,
       userId,
       userAccount
@@ -17,7 +17,7 @@ exports.createTransaction = async (req, res) => {
     const savedTransaction = await newTransaction.save();
 
    return res.status(201).json({
-      message: "Transaction created successfully",
+      message: "Transaction saved successfully",
       transaction: savedTransaction,
     });
   } catch (error) {
@@ -27,24 +27,32 @@ exports.createTransaction = async (req, res) => {
 };
 
 exports.getAllTransaction = async (req, res) => {
-  const {id } = req.params
+  const {id } = req.params;
+  const { startDate, endDate } = req.body;
   try {
     const findUser = await userSchema.findById(id)
 
     if(!findUser) {
       return res.status(404).json({message: 'No user found !'})
     }
-
-    const transactions = await transactionSchema
-      .find({userId: id})
-      .populate(["userId", "userAccount"]);
-    if (!transactions) {
-      return res.status(404).json({ message: "No transactions found!!" });
+    let query = { userId: id };
+    if (startDate && endDate) {
+      query.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
     }
 
+    const transactions = await transactionSchema
+      .find(query)
+      .populate(["userId", "userAccount"]);
+    if (!transactions || transactions.length==0) {
+      return res.status(404).json({ message: "No transactions found in this time period!!" });
+    }
     return res
       .status(200)
-      .json({ message: "Transactions fetched successfully", transactions });
+      .json({ message: "Transactions fetched successfully",
+       transactions:transactions });
   } catch (error) {
     res.status(500).json({ message: "Internal server error" });
   }
@@ -52,41 +60,52 @@ exports.getAllTransaction = async (req, res) => {
 
 exports.getTransactionSummary = async (req, res) => {
   const { id } = req.params;
+  const { startDate, endDate } = req.body;
   try {
     const findUser = await userSchema.findById(id);
     if (!findUser) {
       return res.status(404).json({ message: "No user found" });
     }
+    let query = { userId: id };
+    if (startDate && endDate) {
+      query.date = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
 
     const findTransactions = await transactionSchema
-      .find({ userId: id })
+      .find(query)
       .populate(["userAccount","userId"]);
 
-    if (!findTransactions) {
+    if (!findTransactions || findTransactions.length === 0) {
       return res.status(404).json({
         message: "No transactions found for the specified time period.",
       });
     }
-
-    const transactionData = findTransactions.map((transaction) => ({
-      Transaction_type: transaction.Transaction_type || 0,
-      amount: transaction.amount || 0,
-      category: transaction.category || 0,
-      userAccount: transaction.userAccount || 0,
-      userId: transaction.userAccount || 0
-    }));
+    let totalSavings = 0;
+    const transactionData = findTransactions.map((transaction) => {
+      const saving = transaction.income - transaction.expense;
+      totalSavings += saving;
+      return {
+        income: transaction.income || 0,
+        expense: transaction.expense || 0,
+        saving: saving || 0,
+        userAccount: transaction.userAccount || 0,
+      };
+    });
 
     return res.status(200).json({
       message: "Transaction summary retrieved successfully",
       transactions: transactionData,
+      totalSaving: totalSavings
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error." });
   }
 };
-
-
 
 exports.deleteTransaction = async (req, res) => {
   const { id } = req.params;

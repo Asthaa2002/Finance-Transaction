@@ -1,26 +1,26 @@
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 const userSchema = require("../models/user");
-var nodeMailer = require("nodemailer");
-var { google } = require("googleapis");
+// var nodeMailer = require("nodemailer");
+// var { google } = require("googleapis");
 
 
 
 
-const CLIENT_ID =
-  "78786718195-h617rocjf4icfulhqdlq6ht2aktprd37.apps.googleusercontent.com";
-const CLIENT_SECRET = "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";
-const REDIRECT_URI = "https://developers.google.com/oauthplayground";
-REFRESH_TOKEN =
- " 1//043IvVQNCYR5CCgYIARAAGAQSNwF-L9IrefPed9MuiOsVlygJyXfd8V4WlAFNi1nvA-P8f9HFy3Z-CyV4TYO-5r9YaWdPTc96mBs"
-const oAuth2Client = new google.auth.OAuth2(
-  CLIENT_ID,
-  CLIENT_SECRET,
-  REDIRECT_URI
-);
-oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
+// const CLIENT_ID =
+//   "78786718195-h617rocjf4icfulhqdlq6ht2aktprd37.apps.googleusercontent.com";
+// const CLIENT_SECRET = "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";
+// const REDIRECT_URI = "https://developers.google.com/oauthplayground";
+// REFRESH_TOKEN =
+//  " 1//043IvVQNCYR5CCgYIARAAGAQSNwF-L9IrefPed9MuiOsVlygJyXfd8V4WlAFNi1nvA-P8f9HFy3Z-CyV4TYO-5r9YaWdPTc96mBs"
+// const oAuth2Client = new google.auth.OAuth2(
+//   CLIENT_ID,
+//   CLIENT_SECRET,
+//   REDIRECT_URI
+// );
+// oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-const accessToken = oAuth2Client.getAccessToken();
+// const accessToken = oAuth2Client.getAccessToken();
 
 
 
@@ -55,27 +55,27 @@ exports.userSignup = async(req,res) => {
       });
   
       const result = await newUser.save();
-      const transport = nodeMailer.createTransport({
-        service: "gmail",
-        auth: {
-          type: "OAuth2",
-          user: "kirteeeeesri2002@gmail.com",
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-          refreshToken: REFRESH_TOKEN,
-          accessToken: accessToken,
-        },
-      });
+      // const transport = nodeMailer.createTransport({
+      //   service: "gmail",
+      //   auth: {
+      //     type: "OAuth2",
+      //     user: "kirteeeeesri2002@gmail.com",
+      //     clientId: CLIENT_ID,
+      //     clientSecret: CLIENT_SECRET,
+      //     refreshToken: REFRESH_TOKEN,
+      //     accessToken: accessToken,
+      //   },
+      // });
   
-      const mailOptions = {
-        from: "kirteeeeesri2002@gmail.com",
-        to: email,
-        subject: "Welcome",
-        html: "<h1>Welcome!! You have successfully signed up ! </h1>",
-      };
+      // const mailOptions = {
+      //   from: "kirteeeeesri2002@gmail.com",
+      //   to: email,
+      //   subject: "Welcome",
+      //   html: "<h1>Welcome!! You have successfully signed up ! </h1>",
+      // };
   
-      const mailResult = await transport.sendMail(mailOptions);
-      console.log("Mail sent successfully:", mailResult);
+      // const mailResult = await transport.sendMail(mailOptions);
+      // console.log("Mail sent successfully:", mailResult);
 
       res.status(201).json({
         success: true,

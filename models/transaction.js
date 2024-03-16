@@ -1,17 +1,18 @@
 const mongoose = require("mongoose");
 const transactionSchema = new mongoose.Schema(
   {
-    Transaction_type: {
-      type: String,
-      enum: ["income", "expense"],
-    },
-    amount: {
+   
+    income: {
       type: Number,
-      required: true,
+      required: true
     },
-    category: {
-      type: String,
-      required: true,
+    expense: {
+      type: Number,
+      required: true
+    },
+    saving: {
+      type: Number,
+      required: true
     },
     description: {
       type: String,
