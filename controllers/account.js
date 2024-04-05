@@ -1,14 +1,12 @@
 const accountSchema = require("../models/account");
-
 exports.createAccount = async (req, res) => {
     try {
       const { accountHolder, accountType, accountNumber, balance, currency } =
         req.body;
-  
       const userAccount = await accountSchema.findOne({ accountNumber });
   
       if (userAccount) {
-        return res.status(400).json({ message: "Account already exists" });
+        return res.status(400).json({ message: "Account already exists now" });
       }
   
       const newAccount = new accountSchema({
